@@ -1,6 +1,7 @@
 import UserModel from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+// import mongoose from "mongoose";
 
 const REGISTER_USER = async (req, res) => {
   try {
@@ -119,8 +120,24 @@ const GET_ALL_USERS = async (req, res) => {
     return res.status(201).json({ users: users });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: "something went wrong" });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
-export { REGISTER_USER, LOGIN, GET_NEW_JWT_TOKEN, GET_ALL_USERS };
+const GET_USER_BY_ID = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ _id: req.params.id });
+    return res.status(201).json({ user: user });
+  } catch (err) {
+    console.log(err);
+    return res.status(404).json({ message: "Not found" });
+  }
+};
+
+export {
+  REGISTER_USER,
+  LOGIN,
+  GET_NEW_JWT_TOKEN,
+  GET_ALL_USERS,
+  GET_USER_BY_ID,
+};
