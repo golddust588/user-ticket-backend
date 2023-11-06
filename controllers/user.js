@@ -69,14 +69,48 @@ const LOGIN = async (req, res) => {
       { algorithm: "RS256" }
     );
 
-    return res
-      .status(200)
-      .json({
-        message: "Login successful",
-        jwt_token: jwt_token,
-        jwt_refresh_token: jwt_refresh_token,
-      });
+    return res.status(200).json({
+      message: "Login successful",
+      jwt_token: jwt_token,
+      jwt_refresh_token: jwt_refresh_token,
+    });
   });
 };
 
-export { REGISTER_USER, LOGIN };
+const GET_NEW_JWT_TOKEN = async (req, res) => {
+  try {
+    const jwt_refresh_token = req.headers.authorization;
+
+    // jwt.verify(jwt_refresh_token, process.env.JWT_SECRET, (err, decoded) => {
+    //   if (err) {
+    //     return res.status(401).json({ message: "Bad auth" });
+    //   }
+
+    const decoded = await new Promise((resolve, reject) => {
+      jwt.verify(jwt_refresh_token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(decoded);
+        }
+      });
+    });
+
+    const jwt_token = jwt.sign(
+      { userId: decoded.userId },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" },
+      { algorithm: "RS256" }
+    );
+    return res.status(200).json({
+      status: "User is logged in",
+      jwt_token: jwt_token,
+      jwt_refresh_token: jwt_refresh_token,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ status: "User must log in again" });
+  }
+};
+
+export { REGISTER_USER, LOGIN, GET_NEW_JWT_TOKEN };

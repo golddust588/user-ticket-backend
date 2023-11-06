@@ -1,5 +1,9 @@
 import express from "express";
-import { REGISTER_USER, LOGIN } from "../controllers/user.js";
+import {
+  REGISTER_USER,
+  LOGIN,
+  GET_NEW_JWT_TOKEN,
+} from "../controllers/user.js";
 import {
   registerValidationMiddleware,
   loginValidationMiddleware,
@@ -16,5 +20,6 @@ router.post(
   REGISTER_USER
 );
 router.post("/login", loginValidationMiddleware(userLoginSchema), LOGIN);
+router.get("/token", GET_NEW_JWT_TOKEN);
 
 export default router;
