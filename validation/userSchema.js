@@ -14,4 +14,14 @@ const userRegistrationSchema = Joi.object({
   money_balance: Joi.number().required(),
 });
 
-export { userRegistrationSchema };
+const userLoginSchema = Joi.object({
+  email: Joi.string().email().required(),
+
+  password: Joi.string()
+    .min(6)
+    .max(30)
+    .pattern(new RegExp(".*[0-9].*"))
+    .required(),
+});
+
+export { userRegistrationSchema, userLoginSchema };

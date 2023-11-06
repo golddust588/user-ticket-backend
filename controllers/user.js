@@ -31,18 +31,52 @@ const REGISTER_USER = async (req, res) => {
       { algorithm: "RS256" }
     );
 
-    return res
-      .status(200)
-      .json({
-        status: "User registered",
-        response: response,
-        jwt_token: jwt_token,
-        jwt_refresh_token: jwt_refresh_token,
-      });
+    return res.status(200).json({
+      status: "User registered",
+      response: response,
+      jwt_token: jwt_token,
+      jwt_refresh_token: jwt_refresh_token,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ status: "Something went wrong" });
   }
 };
 
-export { REGISTER_USER };
+const LOGIN = async (req, res) => {
+  const user = await UserModel.findOne({ email: req.body.email });
+
+  if (!user) {
+    return res.status(401).json({ message: "Bad authentication" });
+  }
+
+  bcrypt.compare(req.body.password, user.password, (err, isPasswordMatch) => {
+    if (!isPasswordMatch || err) {
+      return res.status(401).json({ message: "Bad authentication" });
+    }
+
+    const jwt_token = jwt.sign(
+      { email: user.email, userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" },
+      { algorithm: "RS256" }
+    );
+
+    const jwt_refresh_token = jwt.sign(
+      { email: user.email, userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" },
+      { algorithm: "RS256" }
+    );
+
+    return res
+      .status(200)
+      .json({
+        message: "Login successful",
+        jwt_token: jwt_token,
+        jwt_refresh_token: jwt_refresh_token,
+      });
+  });
+};
+
+export { REGISTER_USER, LOGIN };
