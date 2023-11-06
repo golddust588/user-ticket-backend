@@ -113,4 +113,14 @@ const GET_NEW_JWT_TOKEN = async (req, res) => {
   }
 };
 
-export { REGISTER_USER, LOGIN, GET_NEW_JWT_TOKEN };
+const GET_ALL_USERS = async (req, res) => {
+  try {
+    const users = await UserModel.find().sort({ name: "asc" });
+    return res.status(201).json({ users: users });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "something went wrong" });
+  }
+};
+
+export { REGISTER_USER, LOGIN, GET_NEW_JWT_TOKEN, GET_ALL_USERS };

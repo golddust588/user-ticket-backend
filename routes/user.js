@@ -3,7 +3,9 @@ import {
   REGISTER_USER,
   LOGIN,
   GET_NEW_JWT_TOKEN,
+  GET_ALL_USERS,
 } from "../controllers/user.js";
+import auth from "../middlewares/auth.js";
 import {
   registerValidationMiddleware,
   loginValidationMiddleware,
@@ -21,5 +23,6 @@ router.post(
 );
 router.post("/login", loginValidationMiddleware(userLoginSchema), LOGIN);
 router.get("/token", GET_NEW_JWT_TOKEN);
+router.get("/", auth, GET_ALL_USERS);
 
 export default router;
