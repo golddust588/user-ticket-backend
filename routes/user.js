@@ -6,6 +6,7 @@ import {
   GET_ALL_USERS,
   GET_USER_BY_ID,
   BUY_TICKET,
+  GET_ALL_USERS_WITH_TICKETS,
 } from "../controllers/user.js";
 import auth from "../middlewares/auth.js";
 import {
@@ -26,7 +27,8 @@ router.post(
 router.post("/login", loginValidationMiddleware(userLoginSchema), LOGIN);
 router.get("/token", GET_NEW_JWT_TOKEN);
 router.get("/", auth, GET_ALL_USERS);
+router.get("/withTickets", auth, GET_ALL_USERS_WITH_TICKETS);
 router.get("/:id", auth, GET_USER_BY_ID);
-router.put("/:id/buyTicket", auth, BUY_TICKET); //endpoint good?
+router.put("/:id/buyTicket", auth, BUY_TICKET);
 
 export default router;

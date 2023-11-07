@@ -167,6 +167,71 @@ const BUY_TICKET = async (req, res) => {
   }
 };
 
+const GET_ALL_USERS_WITH_TICKETS = async (req, res) => {
+  try {
+    const users_with_tickets = await UserModel.aggregate([
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "bought_tickets",
+          foreignField: "id",
+          as: "bought_tickets_full_data",
+        },
+      },
+    ]);
+
+    return res.status(200).json({ users_with_tickets: users_with_tickets });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+
+  // const GET_ALL_USERS_WITH_TICKETS = async (req, res) => {
+  //   try {
+  //     const users = await UserModel.find();
+  //     console.log(users);
+  //     const users_with_tickets = await users.forEach((user) => {
+  //       console.log(user.bought_tickets);
+  //       if (user.bought_tickets) {
+  //         UserModel.aggregate([
+  //           {
+  //             $lookup: {
+  //               from: "tickets",
+  //               localField: "bought_tickets",
+  //               foreignField: "id",
+  //               as: "user_tickets",
+  //             },
+  //           },
+  //         ]);
+  //       }
+  //     });
+  //     console.log("aaaaa", users_with_tickets);
+  //     return res.status(200).json({ users_with_tickets: users_with_tickets });
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res.status(500).json({ message: "Something went wrong" });
+  //   }
+
+  // try {
+  //   const events = await EventModel.aggregate([
+  //     {
+  //       $lookup: {
+  //         from: "users",
+  //         localField: "visitors",
+  //         foreignField: "id",
+  //         as: "event_visitors",
+  //       },
+  //     },
+  //     { $match: { _id: new mongoose.Types.ObjectId(req.params.id) } },
+  //   ]);
+
+  //   return res.status(200).json({ events: events });
+  // } catch (err) {
+  //   console.log(err);
+  //   return res.status(500).json({ message: "something went wrong" });
+  // }
+};
+
 export {
   REGISTER_USER,
   LOGIN,
@@ -174,4 +239,5 @@ export {
   GET_ALL_USERS,
   GET_USER_BY_ID,
   BUY_TICKET,
+  GET_ALL_USERS_WITH_TICKETS,
 };
