@@ -1,4 +1,5 @@
 import UserModel from "../models/user.js";
+import TicketModel from "../models/ticket.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 // import mongoose from "mongoose";
@@ -134,10 +135,43 @@ const GET_USER_BY_ID = async (req, res) => {
   }
 };
 
+const BUY_TICKET = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const ticket_id = req.body.id;
+    const user = await UserModel.findById(user_id);
+    const ticket = await TicketModel.findById(ticket_id);
+
+    if (user.money_balance < ticket.ticket_price) {
+      return res
+        .status(400)
+        .json({ message: "Not enough money in the account" });
+    }
+
+    const money_left = user.money_balance - ticket.ticket_price;
+
+    await UserModel.updateOne(
+      { _id: user_id },
+      { money_balance: money_left, $push: { bought_tickets: ticket_id } }
+    );
+
+    res.status(200).json({
+      message: `You have bought the ticket: ${ticket.title}`,
+      money_balance: user.money_balance,
+      ticket_price: ticket.ticket_price,
+      money_left: money_left,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 export {
   REGISTER_USER,
   LOGIN,
   GET_NEW_JWT_TOKEN,
   GET_ALL_USERS,
   GET_USER_BY_ID,
+  BUY_TICKET,
 };
