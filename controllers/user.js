@@ -2,7 +2,7 @@ import UserModel from "../models/user.js";
 import TicketModel from "../models/ticket.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-// import mongoose from "mongoose";
+import mongoose from "mongoose";
 
 const REGISTER_USER = async (req, res) => {
   try {
@@ -185,51 +185,27 @@ const GET_ALL_USERS_WITH_TICKETS = async (req, res) => {
     console.log(err);
     return res.status(500).json({ message: "Something went wrong" });
   }
+};
 
-  // const GET_ALL_USERS_WITH_TICKETS = async (req, res) => {
-  //   try {
-  //     const users = await UserModel.find();
-  //     console.log(users);
-  //     const users_with_tickets = await users.forEach((user) => {
-  //       console.log(user.bought_tickets);
-  //       if (user.bought_tickets) {
-  //         UserModel.aggregate([
-  //           {
-  //             $lookup: {
-  //               from: "tickets",
-  //               localField: "bought_tickets",
-  //               foreignField: "id",
-  //               as: "user_tickets",
-  //             },
-  //           },
-  //         ]);
-  //       }
-  //     });
-  //     console.log("aaaaa", users_with_tickets);
-  //     return res.status(200).json({ users_with_tickets: users_with_tickets });
-  //   } catch (err) {
-  //     console.log(err);
-  //     return res.status(500).json({ message: "Something went wrong" });
-  //   }
+const GET_USER_BY_ID_WITH_TICKETS = async (req, res) => {
+  try {
+    const user_with_tickets = await UserModel.aggregate([
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "bought_tickets",
+          foreignField: "id",
+          as: "bought_tickets_full_data",
+        },
+      },
+      { $match: { _id: new mongoose.Types.ObjectId(req.params.id) } },
+    ]);
 
-  // try {
-  //   const events = await EventModel.aggregate([
-  //     {
-  //       $lookup: {
-  //         from: "users",
-  //         localField: "visitors",
-  //         foreignField: "id",
-  //         as: "event_visitors",
-  //       },
-  //     },
-  //     { $match: { _id: new mongoose.Types.ObjectId(req.params.id) } },
-  //   ]);
-
-  //   return res.status(200).json({ events: events });
-  // } catch (err) {
-  //   console.log(err);
-  //   return res.status(500).json({ message: "something went wrong" });
-  // }
+    return res.status(200).json({ user_with_tickets: user_with_tickets });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
 };
 
 export {
@@ -240,4 +216,5 @@ export {
   GET_USER_BY_ID,
   BUY_TICKET,
   GET_ALL_USERS_WITH_TICKETS,
+  GET_USER_BY_ID_WITH_TICKETS,
 };

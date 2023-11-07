@@ -7,6 +7,7 @@ import {
   GET_USER_BY_ID,
   BUY_TICKET,
   GET_ALL_USERS_WITH_TICKETS,
+  GET_USER_BY_ID_WITH_TICKETS,
 } from "../controllers/user.js";
 import auth from "../middlewares/auth.js";
 import {
@@ -29,6 +30,7 @@ router.get("/token", GET_NEW_JWT_TOKEN);
 router.get("/", auth, GET_ALL_USERS);
 router.get("/withTickets", auth, GET_ALL_USERS_WITH_TICKETS);
 router.get("/:id", auth, GET_USER_BY_ID);
+router.get("/:id/withTickets", auth, GET_USER_BY_ID_WITH_TICKETS);
 router.put("/:id/buyTicket", auth, BUY_TICKET);
 
 export default router;
