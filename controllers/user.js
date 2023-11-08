@@ -9,8 +9,12 @@ const REGISTER_USER = async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
 
+    const name = req.body.name;
+
+    const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+
     const user = new UserModel({
-      name: req.body.name,
+      name: capitalizedName,
       email: req.body.email,
       password: hash,
       bought_tickets: [],
@@ -82,11 +86,6 @@ const LOGIN = async (req, res) => {
 const GET_NEW_JWT_TOKEN = async (req, res) => {
   try {
     const jwt_refresh_token = req.headers.authorization;
-
-    // jwt.verify(jwt_refresh_token, process.env.JWT_SECRET, (err, decoded) => {
-    //   if (err) {
-    //     return res.status(401).json({ message: "Bad auth" });
-    //   }
 
     const decoded = await new Promise((resolve, reject) => {
       jwt.verify(jwt_refresh_token, process.env.JWT_SECRET, (err, decoded) => {
